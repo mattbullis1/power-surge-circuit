@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="menu">
+<head>
+  <meta charset="utf-8" />
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover, user-scalable=no"
+  />
+  <meta name="theme-color" content="#020710" />
+  <meta name="color-scheme" content="dark" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>Power Surge Circuit</title>
+  <meta
+    name="description"
+    content="Power Surge Circuit — a futuristic grid arcade game. Guide an electrical surge across circuit boards in endless survival and a 30-level campaign."
+  />
+  <link rel="manifest" href="manifest.json" />
+  <link rel="icon" href="assets/icon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="assets/icon.svg" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+  <div id="app">
+    <div class="screens">
+      <!-- ============================ MAIN MENU ====================== -->
+      <section class="screen is-active" id="screen-menu" aria-label="Main menu">
+        <div class="topbar">
+          <div class="brand">
+            <h2>POWER SURGE</h2>
+            <small>CIRCUIT</small>
+          </div>
+          <div class="spacer"></div>
+          <button class="btn tiny ghost" id="btn-mute" type="button" aria-pressed="false" title="Toggle audio">
+            <span id="mute-glyph" aria-hidden="true">♪</span>
+            <span class="sr-label">Audio on</span>
+          </button>
+        </div>
+
+        <div class="title-block">
+          <h1>POWER SURGE<span>CIRCUIT</span></h1>
+          <p>
+            Route an electrical surge through the machine. Collect energy, extend your trail,
+            and keep the current alive.
+          </p>
+        </div>
+
+        <div class="divider"></div>
+
+        <nav class="menu-actions" aria-label="Game modes">
+          <button class="btn primary" id="menu-endless" type="button">
+            <span class="label"><span class="icon-glyph" aria-hidden="true">⚡</span> Endless Survival</span>
+            <span class="badge" id="menu-endless-best">BEST 0</span>
+          </button>
+          <button class="btn" id="menu-campaign" type="button">
+            <span class="label"><span class="icon-glyph" aria-hidden="true">▣</span> Campaign</span>
+            <span class="badge" id="menu-campaign-progress">1 / 30</span>
+          </button>
+          <button class="btn" id="menu-difficulty" type="button">
+            <span class="label"><span class="icon-glyph" aria-hidden="true">◈</span> Difficulty</span>
+            <span class="badge" id="menu-difficulty-value">NORMAL</span>
+          </button>
+          <button class="btn" id="menu-achievements" type="button">
+            <span class="label"><span class="icon-glyph" aria-hidden="true">✦</span> Achievements</span>
+            <span class="badge" id="menu-achievements-count">0 / 0</span>
+          </button>
+          <button class="btn" id="menu-settings" type="button">
+            <span class="label"><span class="icon-glyph" aria-hidden="true">⚙</span> Settings</span>
+          </button>
+          <button class="btn" id="menu-how" type="button">
+            <span class="label"><span class="icon-glyph" aria-hidden="true">?</span> How to Play</span>
+          </button>
+        </nav>
+
+        <div class="divider"></div>
+        <p class="touch-hint" id="menu-hint">Swipe to steer · Tap to pause</p>
+        <p class="touch-hint desktop-only">Arrow keys / WASD to steer · Space or Esc to pause</p>
+      </section>
+
+      <!-- ========================= DIFFICULTY ======================== -->
+      <section class="screen" id="screen-difficulty" aria-label="Difficulty selection">
+        <div class="topbar">
+          <button class="btn tiny ghost" data-back="screen-menu" type="button">◀ Back</button>
+          <div class="spacer"></div>
+          <h2>Difficulty</h2>
+        </div>
+        <p class="touch-hint" style="margin-bottom: 12px">
+          Difficulty scales movement speed. Game speed can be tuned further in Settings.
+        </p>
+        <div class="card-grid" id="difficulty-grid" role="radiogroup" aria-label="Difficulty"></div>
+      </section>
+
+      <!-- ========================= CAMPAIGN ========================== -->
+      <section class="screen" id="screen-campaign" aria-label="Campaign level selection">
+        <div class="topbar">
+          <button class="btn tiny ghost" data-back="screen-menu" type="button">◀ Back</button>
+          <div class="spacer"></div>
+          <h2>Campaign</h2>
+        </div>
+        <div class="setting-row" style="margin-bottom: 10px">
+          <div class="label">
+            <strong id="campaign-chapter-name">CPU CORE</strong>
+            <span id="campaign-chapter-desc">Boot sector. Clean buses, raw logic.</span>
+          </div>
+          <span class="badge" id="campaign-progress-badge">1/30</span>
+        </div>
+        <div id="campaign-levels"></div>
+      </section>
+
+      <!-- ========================= SETTINGS ========================== -->
+      <section class="screen" id="screen-settings" aria-label="Settings">
+        <div class="topbar">
+          <button class="btn tiny ghost" data-back="screen-menu" type="button">◀ Back</button>
+          <div class="spacer"></div>
+          <h2>Settings</h2>
+        </div>
+
+        <div class="settings-wrap">
+          <div class="setting-group">
+            <h3>Audio</h3>
+            <div class="setting-row">
+              <label class="label" for="set-music">
+                <strong>Music volume</strong>
+                <span>Procedural synthesiser soundtrack.</span>
+              </label>
+              <input id="set-music" type="range" min="0" max="1" step="0.05" value="0.5" aria-describedby="set-music-value" />
+              <span class="value" id="set-music-value">50%</span>
+            </div>
+            <div class="setting-row">
+              <label class="label" for="set-sfx">
+                <strong>Effects volume</strong>
+                <span>Collection, spark and collision sounds.</span>
+              </label>
+              <input id="set-sfx" type="range" min="0" max="1" step="0.05" value="0.7" aria-describedby="set-sfx-value" />
+              <span class="value" id="set-sfx-value">70%</span>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <h3>Gameplay</h3>
+            <div class="setting-row">
+              <label class="label" for="set-speed">
+                <strong>Game speed</strong>
+                <span>Fine-tune the surge rate on top of difficulty.</span>
+              </label>
+              <input id="set-speed" type="range" min="0.75" max="1.25" step="0.05" value="1" />
+              <span class="value" id="set-speed-value">100%</span>
+            </div>
+            <div class="setting-row">
+              <label class="label" for="set-shake">
+                <strong>Screen shake</strong>
+                <span>Impact intensity feedback.</span>
+              </label>
+              <input id="set-shake" type="range" min="0" max="1" step="0.05" value="1" />
+              <span class="value" id="set-shake-value">100%</span>
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <h3>Accessibility</h3>
+            <div class="setting-row">
+              <label class="label" for="set-contrast">
+                <strong>High contrast</strong>
+                <span>Brighter text, thicker outlines, punchier grid.</span>
+              </label>
+              <input class="toggle" id="set-contrast" type="checkbox" role="switch" />
+            </div>
+            <div class="setting-row">
+              <label class="label" for="set-colorblind">
+                <strong>Colourblind assist</strong>
+                <span>Adds shape and pattern cues alongside colour.</span>
+              </label>
+              <input class="toggle" id="set-colorblind" type="checkbox" role="switch" />
+            </div>
+            <div class="setting-row">
+              <label class="label" for="set-motion">
+                <strong>Reduced motion</strong>
+                <span>Calms animation, shake and particle effects.</span>
+              </label>
+              <input class="toggle" id="set-motion" type="checkbox" role="switch" />
+            </div>
+          </div>
+
+          <div class="setting-group">
+            <h3>Data</h3>
+            <div class="setting-row">
+              <label class="label">
+                <strong>Reset progress</strong>
+                <span>Clears scores, level unlocks and achievements. Settings are kept.</span>
+              </label>
+              <button class="btn tiny danger" id="btn-reset-progress" type="button">Reset</button>
+            </div>
+            <div class="setting-row">
+              <label class="label">
+                <strong>Reset everything</strong>
+                <span>Restores factory defaults, including preferences.</span>
+              </label>
+              <button class="btn tiny danger" id="btn-reset-all" type="button">Wipe</button>
+            </div>
+            <div class="setting-row">
+              <label class="label">
+                <strong>Storage status</strong>
+                <span id="storage-status">Checking…</span>
+              </label>
+            </div>
+          </div>
+
+          <p class="touch-hint" id="settings-version">Power Surge Circuit</p>
+        </div>
+      </section>
+
+      <!-- ======================= ACHIEVEMENTS ======================== -->
+      <section class="screen" id="screen-achievements" aria-label="Achievements">
+        <div class="topbar">
+          <button class="btn tiny ghost" data-back="screen-menu" type="button">◀ Back</button>
+          <div class="spacer"></div>
+          <h2>Achievements</h2>
+        </div>
+        <p class="touch-hint" id="achievements-summary" style="margin-bottom: 10px">0 of 0 unlocked</p>
+        <div class="achievement-list" id="achievement-list"></div>
+      </section>
+
+      <!-- ========================== HOW TO =========================== -->
+      <section class="screen" id="screen-how" aria-label="How to play">
+        <div class="topbar">
+          <button class="btn tiny ghost" data-back="screen-menu" type="button">◀ Back</button>
+          <div class="spacer"></div>
+          <h2>How to Play</h2>
+        </div>
+        <div class="settings-wrap">
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 0.72rem; letter-spacing: 0.18em; color: var(--theme-accent)">CONTROLS</h3>
+            <p style="margin: 0; font-size: 0.78rem; line-height: 1.6; color: var(--text-dim)">
+              <strong style="color: var(--text)">Desktop:</strong> Arrow keys or W A S D to steer.
+              Space or Escape pauses.<br />
+              <strong style="color: var(--text)">Mobile:</strong> Swipe to steer. Tap to pause.
+              One turn is always queued, so swipe early.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 0.72rem; letter-spacing: 0.18em; color: var(--theme-accent)">SURVIVAL</h3>
+            <p style="margin: 0; font-size: 0.78rem; line-height: 1.6; color: var(--text-dim)">
+              Energy nodes extend your trail permanently. The board wraps at every edge — leave
+              one side and you appear on the other. Hitting your own trail, a sparking component
+              or an energised barrier ends the run, unless a Shield absorbs it.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 0.72rem; letter-spacing: 0.18em; color: var(--theme-accent)">SCORING</h3>
+            <p style="margin: 0; font-size: 0.78rem; line-height: 1.6; color: var(--text-dim)">
+              100 points per node, plus a bonus that grows with your speed tier. Collect nodes
+              quickly to build a combo multiplier up to 4×.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 0.72rem; letter-spacing: 0.18em; color: var(--theme-accent)">POWER-UPS</h3>
+            <p style="margin: 0; font-size: 0.78rem; line-height: 1.6; color: var(--text-dim)">
+              <strong style="color: var(--text)">Slow Motion</strong> eases the current ·
+              <strong style="color: var(--text)">Double Points</strong> doubles scoring ·
+              <strong style="color: var(--text)">Magnet</strong> pulls in nearby nodes ·
+              <strong style="color: var(--text)">Shield</strong> absorbs one fatal hit.
+            </p>
+          </div>
+          <div class="card">
+            <h3 style="margin: 0 0 6px; font-size: 0.72rem; letter-spacing: 0.18em; color: var(--theme-accent)">CAMPAIGN</h3>
+            <p style="margin: 0; font-size: 0.78rem; line-height: 1.6; color: var(--text-dim)">
+              30 levels across six environments. Objectives include collecting a quota,
+              activating terminals in order, linking terminal pairs, and charging an exit
+              before the timer runs long. Earn up to three stars per level.
+            </p>
+          </div>
+          <button class="btn primary" data-back="screen-menu" type="button">Got it</button>
+        </div>
+      </section>
+
+      <!-- =========================== GAME ============================ -->
+      <section class="screen" id="screen-game" aria-label="Game board">
+        <div class="game-shell">
+          <header class="hud" aria-live="polite">
+            <div class="hud-block">
+              <span class="hud-label">Score</span>
+              <span class="hud-value accent" id="hud-score">0</span>
+              <span class="hud-sub" id="hud-best">BEST 0</span>
+            </div>
+            <div class="hud-block center">
+              <span class="hud-label" id="hud-objective-label">Objective</span>
+              <span class="hud-value" id="hud-objective">0 / 0</span>
+              <div class="hud-objective-bar" aria-hidden="true"><i id="hud-objective-fill" style="width: 0%"></i></div>
+            </div>
+            <div class="hud-block right">
+              <span class="hud-label" id="hud-context-label">Speed</span>
+              <span class="hud-value" id="hud-speed">6.1/s</span>
+              <span class="hud-sub" id="hud-context">LEVEL 1</span>
+            </div>
+          </header>
+
+          <div class="canvas-wrap" id="canvas-wrap">
+            <canvas id="board" role="img" aria-label="Circuit board play area"></canvas>
+            <div class="powerup-strip" id="powerup-strip" aria-hidden="true"></div>
+
+            <div class="countdown" id="countdown" aria-hidden="true">
+              <div class="countdown-inner">
+                <span class="value" id="countdown-value">3</span>
+                <span class="hint" id="countdown-hint">Collect energy nodes</span>
+              </div>
+            </div>
+
+            <!-- Pause modal -->
+            <div class="modal" id="modal-pause" role="dialog" aria-modal="true" aria-labelledby="pause-title">
+              <div class="modal-card">
+                <h2 id="pause-title">Paused</h2>
+                <p class="subtitle" id="pause-subtitle">Endless Survival · Normal</p>
+                <div class="result-grid" id="pause-stats"></div>
+                <div class="modal-actions">
+                  <button class="btn primary" id="btn-resume" type="button">Resume</button>
+                  <div class="row">
+                    <button class="btn" id="btn-pause-settings" type="button">Settings</button>
+                    <button class="btn" id="btn-pause-restart" type="button">Restart</button>
+                  </div>
+                  <button class="btn ghost" id="btn-pause-menu" type="button">Quit to Menu</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Results modal -->
+            <div class="modal" id="modal-results" role="dialog" aria-modal="true" aria-labelledby="results-title">
+              <div class="modal-card">
+                <h2 id="results-title">Meltdown</h2>
+                <p class="subtitle" id="results-subtitle">Endless Survival · Normal</p>
+                <div class="star-row" id="results-stars" aria-label="Star rating"></div>
+                <div class="new-best" id="results-newbest" hidden>New personal best</div>
+                <div class="result-grid" id="results-stats"></div>
+                <div class="modal-actions">
+                  <button class="btn primary" id="btn-results-primary" type="button">Play Again</button>
+                  <div class="row" id="results-secondary-row">
+                    <button class="btn" id="btn-results-secondary" type="button">Retry</button>
+                    <button class="btn ghost" id="btn-results-menu" type="button">Menu</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="toast-stack" id="toast-stack" aria-live="polite"></div>
+          </div>
+
+          <footer class="touch-hint" id="game-footer">
+            <span class="mobile-only">Swipe to steer · Tap to pause</span>
+            <span class="desktop-only">Arrows / WASD · Space to pause</span>
+          </footer>
+        </div>
+      </section>
+    </div>
+  </div>
+
+  <noscript>
+    <div style="padding: 24px; font-family: sans-serif; color: #e8f6ff">
+      <h1>Power Surge Circuit</h1>
+      <p>This game needs JavaScript enabled to run.</p>
+    </div>
+  </noscript>
+
+  <script type="module" src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,25 @@
+# Editor and OS noise
+.vscode/
+.idea/
+*.swp
+Thumbs.db
+Desktop.ini
+ehthumbs.db
+
+# Node (the game has no runtime dependencies; these only appear if tooling is added)
+node_modules/
+npm-debug.log*
+yarn-error.log*
+
+# Local QA scratch output
+/tmp/
+*.log
+
+# Screenshots are committed deliberately as visual documentation, but any
+# temporary capture scratch files are not.
+screenshots/*.ppm
+screenshots/_*.png
+
+# Local environment overrides
+.env
+.env.local

@@ -1,0 +1,20 @@
+{
+  "name": "Power Surge Circuit",
+  "short_name": "Power Surge",
+  "description": "Guide an electrical surge across circuit boards in this futuristic grid arcade game.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "any",
+  "background_color": "#020710",
+  "theme_color": "#020710",
+  "categories": ["games", "entertainment"],
+  "icons": [
+    {
+      "src": "assets/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    }
+  ]
+}
